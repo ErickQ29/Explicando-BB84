@@ -1,0 +1,30 @@
+name: Daily keepalive commit
+
+on:
+  schedule:
+    - cron: '0 9 * * *'  # todos los días a las 09:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set commit identity to repo owner
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+      - name: Append timestamp to .activity
+        run: |
+          echo "$(date -u +'%Y-%m-%dT%H:%M:%SZ') keepalive" >> .activity
+      - name: Commit and push
+        run: |
+          git add .activity
+          git commit -m "chore: daily keepalive [skip ci]" || echo "No changes"
+          git push origin HEAD:main
