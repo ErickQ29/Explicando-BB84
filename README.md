@@ -17,13 +17,6 @@ BB84 es un protocolo de criptografía cuántica que permite a dos partes generar
 ## Estructura del proyecto
 - `index.html`: página principal del sitio (por añadir o actualizar)
 - `README.md`: este documento
-
-## Cómo ver el sitio
-- Puedes abrir `index.html` directamente en tu navegador cuando exista.
-- Para un servidor local rápido:
-  ```bash
-  python3 -m http.server 8000
-  # visita http://localhost:8000
   ```
 
 ## Contribuir
