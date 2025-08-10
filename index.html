@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorador Interactivo del Protocolo BB84</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Soothing Neutrals (#F8F0E3, #3D405B, #81B29A, #F2CC8F) -->
+    <!-- Application Structure Plan: A story-driven, single-page application divided into five thematic sections: Introduction, Core Quantum Principles (interactive), BB84 Protocol Simulation (interactive), Security Analysis & Comparisons, and Future Outlook. This structure guides the user from foundational concepts to practical application and implications, making a complex topic digestible. The interactive simulation is the centerpiece, allowing hands-on learning. -->
+    <!-- Visualization & Content Choices: Report Info -> Goal -> Viz/Presentation -> Interaction -> Justification -> Library/Method. 1. BB84 Process -> Demonstrate Flow -> Custom HTML/CSS/JS Diagram -> User-triggered steps, Eve toggle -> Active learning is better than static text -> Vanilla JS. 2. QBER -> Show eavesdropping impact -> Bar Chart -> Dynamic update based on simulation -> Clearly visualizes the "signature" of intrusion -> Chart.js. 3. Protocol Comparison -> Compare features -> Tabbed content/side-by-side table -> Click to switch views -> Organizes complex comparisons cleanly -> Vanilla JS for tabs. 4. Quantum Principles -> Explain concepts -> Simple interactive divs -> Click/hover to see effect -> Makes abstract ideas tangible -> Vanilla JS. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F0E3;
+            color: #3D405B;
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: #81B29A;
+            border-bottom-color: #81B29A;
+        }
+        .card {
+            background-color: #FFFFFF;
+            border: 1px solid #E0D8CC;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .btn {
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .photon-stream {
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .photon {
+            display: inline-block;
+            width: 2rem;
+            height: 2rem;
+            line-height: 2rem;
+            text-align: center;
+            margin: 0 0.25rem;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 1.25rem;
+            transition: all 0.5s ease-in-out;
+        }
+        .base-rect { background-color: #F2CC8F; color: #3D405B; }
+        .base-diag { background-color: #81B29A; color: #FFFFFF; }
+        .bit-0 { border: 2px solid #58A6FF; }
+        .bit-1 { border: 2px solid #F97583; }
+        .error { background-color: #EF4444 !important; color: white !important; }
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 300px;
+            width: 100%;
+            max-width: 600px;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header id="header" class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-md">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-[#3D405B]">Protocolo BB84</h1>
+            <div class="hidden md:flex space-x-8">
+                <a href="#intro" class="nav-link active">Introducción</a>
+                <a href="#principles" class="nav-link">Principios</a>
+                <a href="#simulation" class="nav-link">Simulación</a>
+                <a href="#security" class="nav-link">Seguridad</a>
+                <a href="#future" class="nav-link">Futuro</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+
+        <section id="intro" class="text-center min-h-[60vh] flex flex-col justify-center items-center">
+            <h2 class="text-4xl md:text-6xl font-bold mb-4 leading-tight">La Clave del Futuro es Cuántica</h2>
+            <p class="max-w-3xl mx-auto text-lg md:text-xl text-gray-700 mb-8">
+                La criptografía clásica, que protege nuestras comunicaciones hoy, es vulnerable a las computadoras cuánticas del mañana. El protocolo BB84 no es solo una mejora; es una revolución en seguridad que utiliza las leyes de la física para crear claves secretas inquebrantables. Esta aplicación te guiará para entender cómo funciona.
+            </p>
+            <a href="#principles" class="bg-[#81B29A] text-white font-bold py-3 px-8 rounded-full text-lg btn">
+                Descubre Cómo →
+            </a>
+        </section>
+
+        <section id="principles" class="py-20">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold">Los Pilares Cuánticos del BB84</h2>
+                <p class="max-w-2xl mx-auto mt-4 text-gray-600">
+                    La seguridad del BB84 no se basa en problemas matemáticos complejos, sino en tres principios fundamentales de la mecánica cuántica. Interactúa con ellos para entender su poder.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="card p-6 rounded-lg text-center">
+                    <div class="text-5xl mb-4">🌀</div>
+                    <h3 class="text-2xl font-bold mb-2">Superposición</h3>
+                    <p class="text-gray-600 mb-4">Un bit cuántico (qubit) puede ser 0, 1 o ambos a la vez. ¡Intenta medirlo!</p>
+                    <div id="superposition-demo" class="w-24 h-24 mx-auto rounded-full flex items-center justify-center text-4xl font-bold cursor-pointer bg-gray-200 animate-pulse" style="font-family: monospace;">?</div>
+                    <p class="mt-2 text-sm text-gray-500">Haz clic en el qubit</p>
+                </div>
+                <div class="card p-6 rounded-lg text-center">
+                    <div class="text-5xl mb-4">🔬</div>
+                    <h3 class="text-2xl font-bold mb-2">Principio de Incertidumbre</h3>
+                    <p class="text-gray-600 mb-4">Medir un qubit puede alterarlo. Si usas la "lente" incorrecta, cambias el mensaje.</p>
+                    <div class="flex justify-center space-x-4 mt-4">
+                        <button id="measure-correct" class="btn bg-[#81B29A] text-white px-4 py-2 rounded-md">Medir Correcto</button>
+                        <button id="measure-incorrect" class="btn bg-[#F2CC8F] text-[#3D405B] px-4 py-2 rounded-md">Medir Incorrecto</button>
+                    </div>
+                    <p id="uncertainty-result" class="mt-4 font-mono text-lg h-6"></p>
+                </div>
+                <div class="card p-6 rounded-lg text-center">
+                    <div class="text-5xl mb-4">🚫</div>
+                    <h3 class="text-2xl font-bold mb-2">Teorema de No Clonación</h3>
+                    <p class="text-gray-600 mb-4">Es imposible crear una copia perfecta de un estado cuántico desconocido.</p>
+                     <div class="flex items-center justify-center mt-4">
+                        <span class="text-3xl">Ψ</span>
+                        <span class="mx-4 text-2xl">→</span>
+                        <div class="p-2 border-2 border-dashed border-gray-400 rounded-md">
+                           <span class="text-3xl text-red-500">?</span>
+                           <span class="text-3xl text-red-500">?</span>
+                        </div>
+                    </div>
+                    <p class="mt-2 text-sm text-gray-500">Un espía no puede copiar y reenviar sin ser detectado.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="simulation" class="py-20 bg-white rounded-2xl shadow-xl">
+            <div class="text-center mb-12 px-4">
+                <h2 class="text-3xl md:text-4xl font-bold">Simulación Interactiva del BB84</h2>
+                <p class="max-w-3xl mx-auto mt-4 text-gray-600">
+                    Aquí es donde la teoría se encuentra con la práctica. Sigue los pasos para generar una clave secreta entre Alice y Bob. Activa a "Eve", la espía, para ver cómo su intromisión deja una huella inconfundible.
+                </p>
+            </div>
+
+            <div class="max-w-6xl mx-auto px-4">
+                <div class="bg-gray-100 p-6 rounded-lg mb-8 flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div class="flex-1">
+                        <label for="qubit-slider" class="block font-medium mb-2">Número de Qubits a Enviar: <span id="qubit-count">16</span></label>
+                        <input id="qubit-slider" type="range" min="8" max="40" value="16" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <label for="eve-toggle" class="font-medium">Activar a la Espía (Eve):</label>
+                        <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                            <input type="checkbox" name="toggle" id="eve-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                            <label for="eve-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                        </div>
+                        <style>.toggle-checkbox:checked { right: 0; border-color: #81B29A; } .toggle-checkbox:checked + .toggle-label { background-color: #81B29A; }</style>
+                    </div>
+                    <button id="start-simulation" class="w-full md:w-auto btn bg-[#3D405B] text-white font-bold py-3 px-8 rounded-lg">Iniciar Simulación</button>
+                </div>
+
+                <div id="simulation-results" class="space-y-8">
+                    <!-- Step 1: Alice -->
+                    <div class="card p-6 rounded-lg">
+                        <h3 class="font-bold text-xl mb-2">Paso 1: Alice envía fotones</h3>
+                        <p class="text-sm text-gray-500 mb-4">Alice genera bits y bases aleatorias, y los codifica en fotones.</p>
+                        <div class="font-mono p-2 bg-gray-50 rounded overflow-x-auto">
+                            <p>Bits de Alice: <span id="alice-bits" class="break-all"></span></p>
+                            <p>Bases de Alice: <span id="alice-bases" class="break-all"></span></p>
+                            <div class="mt-2 photon-stream"><div id="alice-photons"></div></div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Eve (optional) -->
+                    <div id="eve-step" class="card p-6 rounded-lg hidden">
+                        <h3 class="font-bold text-xl mb-2 text-red-600">¡Intrusión! Eve intercepta</h3>
+                        <p class="text-sm text-gray-500 mb-4">Eve mide los fotones con bases aleatorias, alterando algunos de ellos.</p>
+                        <div class="font-mono p-2 bg-red-50 rounded overflow-x-auto">
+                            <p>Bases de Eve: <span id="eve-bases" class="break-all"></span></p>
+                            <p>Bits medidos por Eve: <span id="eve-bits" class="break-all"></span></p>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Bob -->
+                    <div class="card p-6 rounded-lg">
+                        <h3 class="font-bold text-xl mb-2">Paso 2: Bob mide los fotones</h3>
+                        <p class="text-sm text-gray-500 mb-4">Bob usa sus propias bases aleatorias para medir los fotones que llegan.</p>
+                        <div class="font-mono p-2 bg-gray-50 rounded overflow-x-auto">
+                            <p>Bases de Bob: <span id="bob-bases" class="break-all"></span></p>
+                            <p>Bits medidos por Bob: <span id="bob-bits" class="break-all"></span></p>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Sifting -->
+                    <div class="card p-6 rounded-lg">
+                        <h3 class="font-bold text-xl mb-2">Paso 3: Discusión pública y filtrado</h3>
+                        <p class="text-sm text-gray-500 mb-4">Alice y Bob anuncian sus bases (no los bits) y descartan aquellas donde no coincidieron.</p>
+                        <div id="sifting-visual" class="font-mono p-2 bg-gray-50 rounded overflow-x-auto"></div>
+                    </div>
+                    
+                    <!-- Step 5: Final Key & QBER -->
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="card p-6 rounded-lg">
+                            <h3 class="font-bold text-xl mb-2">Paso 4: Clave secreta (bruta)</h3>
+                            <p class="text-sm text-gray-500 mb-4">Los bits restantes forman la clave secreta compartida.</p>
+                            <p class="font-mono text-lg bg-green-100 text-green-800 p-3 rounded break-all" id="final-key">N/A</p>
+                             <p class="text-sm text-gray-500 mt-2">Longitud: <span id="key-length">0</span></p>
+                        </div>
+                        <div class="card p-6 rounded-lg">
+                            <h3 class="font-bold text-xl mb-2">Paso 5: Tasa de Error (QBER)</h3>
+                            <p class="text-sm text-gray-500 mb-4">Comparan una muestra de su clave para detectar errores. ¡La presencia de Eve aumenta la tasa de error!</p>
+                             <div class="chart-container">
+                                <canvas id="qber-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="security" class="py-20">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold">Análisis de Seguridad y Comparativas</h2>
+                <p class="max-w-2xl mx-auto mt-4 text-gray-600">
+                    ¿Cómo se compara el BB84 con otros métodos y cuáles son sus limitaciones en el mundo real?
+                </p>
+            </div>
+            <div class="max-w-5xl mx-auto">
+                <div class="card rounded-lg p-8">
+                    <h3 class="text-2xl font-bold mb-4 text-center">BB84 vs. Criptografía Clásica (Diffie-Hellman)</h3>
+                    <div class="grid md:grid-cols-2 gap-8 text-center">
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">BB84 (Cuántico)</h4>
+                            <ul class="space-y-2 text-left">
+                                <li class="flex items-start"><span class="text-green-500 mr-2">✔</span><span><strong>Seguridad:</strong> Basada en leyes de la física (incondicional).</span></li>
+                                <li class="flex items-start"><span class="text-green-500 mr-2">✔</span><span><strong>Detección de Espías:</strong> Inherente. La escucha es detectable.</span></li>
+                                <li class="flex items-start"><span class="text-green-500 mr-2">✔</span><span><strong>Resistencia Cuántica:</strong> Inmune a ataques de computadoras cuánticas.</span></li>
+                                <li class="flex items-start"><span class="text-red-500 mr-2">✖</span><span><strong>Limitaciones:</strong> Distancia, velocidad, costo, hardware especializado.</span></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">Diffie-Hellman (Clásico)</h4>
+                            <ul class="space-y-2 text-left">
+                                <li class="flex items-start"><span class="text-red-500 mr-2">✖</span><span><strong>Seguridad:</strong> Basada en dificultad computacional (condicional).</span></li>
+                                <li class="flex items-start"><span class="text-red-500 mr-2">✖</span><span><strong>Detección de Espías:</strong> No inherente. Un espía pasivo es indetectable.</span></li>
+                                <li class="flex items-start"><span class="text-red-500 mr-2">✖</span><span><strong>Resistencia Cuántica:</strong> Vulnerable al algoritmo de Shor.</span></li>
+                                <li class="flex items-start"><span class="text-green-500 mr-2">✔</span><span><strong>Limitaciones:</strong> Implementación simple y barata con la infraestructura actual.</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="future" class="py-20 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold">El Futuro de la Comunicación Segura</h2>
+            <p class="max-w-3xl mx-auto mt-4 text-gray-600 mb-8">
+                El protocolo BB84 y la Distribución Cuántica de Claves (QKD) son más que curiosidades académicas; son la base para una nueva generación de redes de comunicación seguras. Aunque persisten desafíos en distancia, velocidad y costo, la investigación avanza rápidamente. En el futuro, la QKD podría asegurar infraestructuras críticas, desde finanzas hasta gobiernos, protegiéndonos en una era donde las amenazas computacionales son cada vez más poderosas.
+            </p>
+            <div class="text-xs text-gray-400">
+                <p>Aplicación interactiva creada para explorar el protocolo BB84.</p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.toggle('active', link.getAttribute('href').substring(1) === entry.target.id);
+                        });
+                    }
+                });
+            }, { rootMargin: '-50% 0px -50% 0px' });
+
+            sections.forEach(section => observer.observe(section));
+
+            const superpositionDemo = document.getElementById('superposition-demo');
+            superpositionDemo.addEventListener('click', () => {
+                superpositionDemo.classList.remove('animate-pulse');
+                const result = Math.random() > 0.5 ? '1' : '0';
+                superpositionDemo.textContent = result;
+                setTimeout(() => {
+                    superpositionDemo.textContent = '?';
+                    superpositionDemo.classList.add('animate-pulse');
+                }, 1500);
+            });
+            
+            const uncertaintyResult = document.getElementById('uncertainty-result');
+            document.getElementById('measure-correct').addEventListener('click', () => {
+                uncertaintyResult.textContent = 'Resultado: 0 (Correcto)';
+                uncertaintyResult.classList.remove('text-red-500');
+                uncertaintyResult.classList.add('text-green-500');
+            });
+            document.getElementById('measure-incorrect').addEventListener('click', () => {
+                const result = Math.random() > 0.5 ? '1' : '0';
+                uncertaintyResult.textContent = `Resultado: ${result} (Alterado!)`;
+                uncertaintyResult.classList.remove('text-green-500');
+                uncertaintyResult.classList.add('text-red-500');
+            });
+            
+            const qubitSlider = document.getElementById('qubit-slider');
+            const qubitCountSpan = document.getElementById('qubit-count');
+            qubitSlider.addEventListener('input', (e) => {
+                qubitCountSpan.textContent = e.target.value;
+            });
+
+            const startBtn = document.getElementById('start-simulation');
+            startBtn.addEventListener('click', runSimulation);
+
+            let qberChart;
+
+            function createPhotonElement(bit, base) {
+                const photon = document.createElement('div');
+                photon.classList.add('photon');
+                photon.classList.add(base === 0 ? 'base-rect' : 'base-diag');
+                photon.innerHTML = base === 0 ? (bit === 0 ? '&#8593;' : '&#8594;') : (bit === 0 ? '&#8598;' : '&#8599;');
+                return photon;
+            }
+
+            function runSimulation() {
+                const numQubits = parseInt(qubitSlider.value);
+                const eveActive = document.getElementById('eve-toggle').checked;
+
+                const aliceBits = Array.from({ length: numQubits }, () => Math.round(Math.random()));
+                const aliceBases = Array.from({ length: numQubits }, () => Math.round(Math.random()));
+
+                document.getElementById('alice-bits').textContent = aliceBits.join(' ');
+                document.getElementById('alice-bases').textContent = aliceBases.map(b => b === 0 ? '+' : 'x').join(' ');
+                const alicePhotonsContainer = document.getElementById('alice-photons');
+                alicePhotonsContainer.innerHTML = '';
+                aliceBits.forEach((bit, i) => {
+                    alicePhotonsContainer.appendChild(createPhotonElement(bit, aliceBases[i]));
+                });
+
+                let transmittedBits = [...aliceBits];
+                let transmittedBases = [...aliceBases];
+
+                const eveStep = document.getElementById('eve-step');
+                if (eveActive) {
+                    eveStep.classList.remove('hidden');
+                    const eveBases = Array.from({ length: numQubits }, () => Math.round(Math.random()));
+                    const eveBits = [];
+                    for (let i = 0; i < numQubits; i++) {
+                        if (aliceBases[i] === eveBases[i]) {
+                            eveBits.push(aliceBits[i]);
+                        } else {
+                            const newBit = Math.round(Math.random());
+                            eveBits.push(newBit);
+                            transmittedBits[i] = newBit;
+                            transmittedBases[i] = eveBases[i];
+                        }
+                    }
+                    document.getElementById('eve-bases').textContent = eveBases.map(b => b === 0 ? '+' : 'x').join(' ');
+                    document.getElementById('eve-bits').textContent = eveBits.join(' ');
+                } else {
+                    eveStep.classList.add('hidden');
+                }
+
+                const bobBases = Array.from({ length: numQubits }, () => Math.round(Math.random()));
+                const bobBits = [];
+                for (let i = 0; i < numQubits; i++) {
+                    if (transmittedBases[i] === bobBases[i]) {
+                        bobBits.push(transmittedBits[i]);
+                    } else {
+                        bobBits.push(Math.round(Math.random()));
+                    }
+                }
+
+                document.getElementById('bob-bases').textContent = bobBases.map(b => b === 0 ? '+' : 'x').join(' ');
+                document.getElementById('bob-bits').textContent = bobBits.join(' ');
+
+                const siftingVisual = document.getElementById('sifting-visual');
+                siftingVisual.innerHTML = '';
+                const finalKey = [];
+                const aliceKeyForCheck = [];
+                const bobKeyForCheck = [];
+
+                for (let i = 0; i < numQubits; i++) {
+                    const match = aliceBases[i] === bobBases[i];
+                    const div = document.createElement('div');
+                    div.className = `inline-block text-center p-2 m-1 rounded ${match ? 'bg-green-100' : 'bg-red-100'}`;
+                    div.innerHTML = `
+                        <div class="text-xs">A: ${aliceBases[i] === 0 ? '+' : 'x'} | B: ${bobBases[i] === 0 ? '+' : 'x'}</div>
+                        <div class="font-bold">${bobBits[i]}</div>
+                    `;
+                    siftingVisual.appendChild(div);
+                    if (match) {
+                        finalKey.push(bobBits[i]);
+                        aliceKeyForCheck.push(aliceBits[i]);
+                        bobKeyForCheck.push(bobBits[i]);
+                    }
+                }
+                
+                document.getElementById('final-key').textContent = finalKey.length > 0 ? finalKey.join('') : 'Ninguna clave generada';
+                document.getElementById('key-length').textContent = finalKey.length;
+
+                let errors = 0;
+                for (let i = 0; i < aliceKeyForCheck.length; i++) {
+                    if (aliceKeyForCheck[i] !== bobKeyForCheck[i]) {
+                        errors++;
+                    }
+                }
+                const qber = aliceKeyForCheck.length > 0 ? (errors / aliceKeyForCheck.length) * 100 : 0;
+                const naturalErrorRate = eveActive ? 0 : Math.random() * 3 + 1;
+                const finalQBER = eveActive ? qber : naturalErrorRate;
+
+                const ctx = document.getElementById('qber-chart').getContext('2d');
+                if (qberChart) {
+                    qberChart.destroy();
+                }
+                qberChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Tasa de Error de Bits Cuánticos (QBER)'],
+                        datasets: [{
+                            label: 'Tasa de Error Medida',
+                            data: [finalQBER],
+                            backgroundColor: finalQBER > 11 ? 'rgba(239, 68, 68, 0.6)' : 'rgba(129, 178, 154, 0.6)',
+                            borderColor: finalQBER > 11 ? 'rgba(239, 68, 68, 1)' : 'rgba(129, 178, 154, 1)',
+                            borderWidth: 1
+                        }, {
+                           label: 'Umbral de Seguridad (11%)',
+                           data: [11],
+                           type: 'line',
+                           borderColor: '#F97583',
+                           borderWidth: 2,
+                           fill: false,
+                           pointRadius: 0,
+                           borderDash: [5, 5]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 50,
+                                title: {
+                                    display: true,
+                                    text: 'Porcentaje de Error (%)'
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.dataset.label}: ${context.raw.toFixed(2)}%`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            startBtn.click();
+        });
+    </script>
+</body>
+</html>
