@@ -25,3 +25,5 @@ BB84 es un protocolo de criptografía cuántica que permite a dos partes generar
 ## Licencia
 Este proyecto se publica con fines educativos. Puedes reutilizar el contenido citando la fuente.
 
+## VER LA PAGINA AQUI:
+- https://erickq29.github.io/Explicando-BB84/
